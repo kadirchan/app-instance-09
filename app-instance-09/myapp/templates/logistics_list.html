@@ -90,11 +90,27 @@
                             href="{% url 'logistics_edit' logistic.pk %}"
                             >Edit</a
                         >
-
                     </div>
-
                 </td>
-                <td><a class="btn btn-danger btn-sm align-middle" style='margin-top: 5px' href="{% url 'logistics_delete' logistic.pk %}">Delete</a></td>
+                <td>
+                    <div style="display: flex">
+                        <a
+                            style="
+                                font-size: 20px;
+                                box-shadow: 5px 3px 0px 2px black;
+                                padding: 2px;
+                                border-radius: 5px;
+                                display: flex;
+                                background-color: #ee1e1e;
+                                border: 1px solid #000000;
+                                color: white;
+                            "
+                            class="btn btn-primary"
+                            href="{% url 'logistics_delete' logistic.pk %}"
+                            >Delete</a
+                        >
+                    </div>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
