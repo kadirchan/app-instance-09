@@ -101,46 +101,47 @@ def donation_create_view(request):
 
 def donation_edit_view(request, pk):
     donation = get_object_or_404(Donation, pk=pk)
+    donation_items = Donation_has_Items.objects.filter(Donation_DonationID=donation)
+    donation_currencies = Donation_has_Currency.objects.filter(Donation_DonationID=donation)
 
     if request.method == 'POST':
         form = DonationForm(request.POST, instance=donation)
-        item_formset = DonationItemFormset(request.POST, prefix='items',
-                                           queryset=Donation_has_Items.objects.filter(Donation_DonationID=donation))
-        currency_formset = DonationCurrencyFormset(request.POST, prefix='currencies',
-                                                   queryset=Donation_has_Currency.objects.filter(Donation_DonationID=donation))
 
-        # Check if the main form is valid
+        item_forms = [DonationItemFormset(request.POST, prefix=f'item-{i}', instance=item) for i, item in
+                      enumerate(donation_items)]
+        currency_forms = [DonationCurrencyFormset(request.POST, prefix=f'currency-{i}', instance=currency) for
+                          i, currency in enumerate(donation_currencies)]
+
         if form.is_valid():
-            donation = form.save(commit=False)  # Do not save the donation yet
+            donation = form.save()
 
-        # Check if the item formset is valid
-        if item_formset.is_valid():
-            items = item_formset.save(commit=False)
-            for item in items:
+        for item_form in item_forms:
+            if item_form.is_valid():
+                item = item_form.save(commit=False)
                 item.Donation_DonationID = donation
                 item.save()
 
-        # Check if the currency formset is valid
-        if currency_formset.is_valid():
-            currencies = currency_formset.save(commit=False)
-            for currency in currencies:
+        for currency_form in currency_forms:
+            if currency_form.is_valid():
+                currency = currency_form.save(commit=False)
                 currency.Donation_DonationID = donation
                 currency.save()
 
-        donation.save()  # Now save the donation
         return redirect('donations')
     else:
         form = DonationForm(instance=donation)
-        item_formset = DonationItemFormset(prefix='items', queryset=Donation_has_Items.objects.filter(Donation_DonationID=donation))
-        currency_formset = DonationCurrencyFormset(prefix='currencies', queryset=Donation_has_Currency.objects.filter(Donation_DonationID=donation))
+        item_forms = [DonationItemFormset(prefix=f'item-{i}', instance=item) for i, item in enumerate(donation_items)]
+        currency_forms = [DonationCurrencyFormset(prefix=f'currency-{i}', instance=currency) for i, currency in
+                          enumerate(donation_currencies)]
 
     context = {
         'form': form,
-        'item_formset': item_formset,
-        'currency_formset': currency_formset
+        'item_forms': item_forms,
+        'currency_forms': currency_forms
     }
 
     return render(request, 'donation_edit.html', context)
+
 
 
 def donation_delete_view(request, pk):
@@ -160,7 +161,7 @@ def logistics_list_view(request):
         form = AddLogisticsCompanyForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('logistics') # assuming this is the name of your view
+            return redirect('logistics')
     else:
         form = AddLogisticsCompanyForm()
 
@@ -235,29 +236,28 @@ def expense_report(request):
     purchases = Purchase.objects.all()
     items = Items.objects.all()
 
-    # calculate total cost of all purchases
+
     total_purchase_cost = sum(purchase.TransactionCost for purchase in purchases)
 
     total_logistics_cost = LogisticsCompany_has_District.objects.aggregate(Sum('CostOfOutsource'))['CostOfOutsource__sum'] or 0
 
-    # calculate district logistics costs
+
     district_logistics_costs = LogisticsCompany_has_District.objects.values(
         'District_DistrictID__DistrictName').annotate(total_cost=Sum('CostOfOutsource')).order_by('-total_cost')
 
-    # Convert the queryset into a dictionary
+
     district_logistics_costs = {entry['District_DistrictID__DistrictName']: entry['total_cost'] for entry in
                                 district_logistics_costs}
 
-    # calculate cost for each item and category
+
     item_category_costs = {}
     for item in items:
-        # get all purchases of the current item
+
         item_purchases = Purchase_has_Items.objects.filter(Items_ItemID=item.ItemID)
 
-        # calculate the total cost of all purchases of the current item
+
         item_total_cost = sum(item_purchase.UnitItemCost * item_purchase.Amount for item_purchase in item_purchases)
 
-        # add the total cost to the item category costs
         if item.ItemCategory not in item_category_costs:
             item_category_costs[item.ItemCategory] = []
 
@@ -266,14 +266,12 @@ def expense_report(request):
             'total_cost': item_total_cost,
         })
 
-    # order the item costs within each category and keep top 10
     for category, item_costs in item_category_costs.items():
         item_category_costs[category] = sorted(item_costs, key=lambda x: x['total_cost'], reverse=True)[:10]
 
-    # calculate system cost
+
     system_cost = total_purchase_cost + total_logistics_cost
 
-    # calculate percentages
     item_percentage = format((total_purchase_cost / system_cost) * 100, '.2f') if system_cost else 0
     logistics_percentage = format((total_logistics_cost / system_cost) * 100, '.2f') if system_cost else 0
 
@@ -303,7 +301,7 @@ def export_percentages(request):
     response['Content-Disposition'] = 'attachment; filename=percentages.csv'
     return response
 
-# view function for logistics CSV
+
 def export_item_costs(request):
     items = Items.objects.all()
     item_category_costs = {}

@@ -56,8 +56,16 @@ class AddLogisticsCompanyForm(forms.ModelForm):
         fields = ['CompanyID','CompanyName', 'Phone']
 
 
-DonationItemFormset = modelformset_factory(Donation_has_Items, fields=('Donation_DonationID','Items_ItemID', 'Quantity'), extra=0)
-DonationCurrencyFormset = modelformset_factory(Donation_has_Currency, fields=('Donation_DonationID','Currency_CurrencyType', 'Amount'), extra=0)
+
+class DonationCurrencyFormset(forms.ModelForm):
+    class Meta:
+        model = Donation_has_Currency
+        fields = ['Donation_DonationID','Currency_CurrencyType', 'Amount']
+
+class DonationItemFormset(forms.ModelForm):
+    class Meta:
+        model = Donation_has_Items
+        fields = ['Donation_DonationID','Items_ItemID', 'Quantity']
 class DonationForm(forms.ModelForm):
     class Meta:
         model = Donation
