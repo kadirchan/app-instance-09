@@ -103,24 +103,36 @@ def donation_edit_view(request, pk):
     donation = get_object_or_404(Donation, pk=pk)
 
     if request.method == 'POST':
-        # donation.delete()
         form = DonationForm(request.POST, instance=donation)
         item_formset = DonationItemFormset(request.POST, prefix='items',
                                            queryset=Donation_has_Items.objects.filter(Donation_DonationID=donation))
         currency_formset = DonationCurrencyFormset(request.POST, prefix='currencies',
-                                                   queryset=Donation_has_Currency.objects.filter(
-                                                       Donation_DonationID=donation))
-        if form.is_valid() and item_formset.is_valid() and currency_formset.is_valid():
-            form.save()
-            item_formset.save()
-            currency_formset.save()
-            return redirect('donations')
+                                                   queryset=Donation_has_Currency.objects.filter(Donation_DonationID=donation))
+
+        # Check if the main form is valid
+        if form.is_valid():
+            donation = form.save(commit=False)  # Do not save the donation yet
+
+        # Check if the item formset is valid
+        if item_formset.is_valid():
+            items = item_formset.save(commit=False)
+            for item in items:
+                item.Donation_DonationID = donation
+                item.save()
+
+        # Check if the currency formset is valid
+        if currency_formset.is_valid():
+            currencies = currency_formset.save(commit=False)
+            for currency in currencies:
+                currency.Donation_DonationID = donation
+                currency.save()
+
+        donation.save()  # Now save the donation
+        return redirect('donations')
     else:
         form = DonationForm(instance=donation)
-        item_formset = DonationItemFormset(prefix='items',
-                                           queryset=Donation_has_Items.objects.filter(Donation_DonationID=donation))
-        currency_formset = DonationCurrencyFormset(prefix='currencies', queryset=Donation_has_Currency.objects.filter(
-            Donation_DonationID=donation))
+        item_formset = DonationItemFormset(prefix='items', queryset=Donation_has_Items.objects.filter(Donation_DonationID=donation))
+        currency_formset = DonationCurrencyFormset(prefix='currencies', queryset=Donation_has_Currency.objects.filter(Donation_DonationID=donation))
 
     context = {
         'form': form,
@@ -129,6 +141,7 @@ def donation_edit_view(request, pk):
     }
 
     return render(request, 'donation_edit.html', context)
+
 
 def donation_delete_view(request, pk):
     donation = get_object_or_404(Donation, pk=pk)
@@ -159,7 +172,12 @@ def logistics_list_view(request):
     context = {'logistics': logistics_companies, 'logistics_districts': logistics_districts, 'form': form}
     return render(request, 'logistics_list.html', context)
 
-
+def logistics_delete(request, pk):
+    logistic_company = get_object_or_404(LogisticsCompany, pk=pk)
+    if request.method == 'POST':
+        logistic_company.delete()
+        return redirect('logistics')
+    return render(request, 'delete_confirm.html', {'object': logistic_company})
 def logistics_update_view(request, pk):
     logistics = get_object_or_404(LogisticsCompany, pk=pk)
     districts = District.objects.all()

@@ -65,6 +65,7 @@
                 <th scope="col">Company Name</th>
                 <th scope="col">Phone</th>
                 <th scope="col">Edit</th>
+                <th scope="col">Delete</th>
             </tr>
         </thead>
         <tbody>
@@ -89,8 +90,11 @@
                             href="{% url 'logistics_edit' logistic.pk %}"
                             >Edit</a
                         >
+
                     </div>
+
                 </td>
+                <td><a class="btn btn-danger btn-sm align-middle" style='margin-top: 5px' href="{% url 'logistics_delete' logistic.pk %}">Delete</a></td>
             </tr>
             {% endfor %}
         </tbody>

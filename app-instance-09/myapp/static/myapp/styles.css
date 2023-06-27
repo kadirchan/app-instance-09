@@ -110,6 +110,7 @@ h1 {
     color: white !important;
 }
 
+
 .navbar-donation-button:hover {
     background-color: #28a745 !important;
     color: white !important;
@@ -132,14 +133,14 @@ h1 {
 }
 
 .fancy-title {
-    font-family: "Arial Black", sans-serif;
+    font-family: 'Arial Black', sans-serif;
     font-size: 4rem;
     font-weight: bold;
     color: #333;
 }
 
 .welcome-title {
-    font-family: "Arial Black", sans-serif;
+    font-family: 'Arial Black', sans-serif;
     font-size: 4rem;
     font-weight: bold;
     color: #333;
@@ -179,39 +180,37 @@ h1 {
 }
 
 /* Define a fixed height for donation items and currencies */
-.donation-items,
-.donation-currencies {
-    height: 100px; /* Adjust the height as needed */
-    overflow: auto;
+.donation-items, .donation-currencies {
+  height: 100px; /* Adjust the height as needed */
+  overflow: auto;
 }
 
 /* Add padding and margins to the item and currency elements */
-.item,
-.currency {
-    padding: 5px;
-    margin-bottom: 10px;
+.item, .currency {
+  padding: 5px;
+  margin-bottom: 10px;
 }
 
 /* Style the item and currency texts */
-.item p,
-.currency p {
-    margin: 0;
+.item p, .currency p {
+  margin: 0;
 }
 
 /* Style the item ID, category, and quantity individually */
 .item .item-id {
-    font-weight: bold;
+  font-weight: bold;
 }
 
 .item .item-category {
-    color: gray;
+  color: gray;
 }
 
 .item .item-quantity {
-    font-style: italic;
+  font-style: italic;
 }
 
 /* Style the currency type and amount individually */
 .currency .currency-type {
-    font-weight: bold;
+  font-weight: bold;
 }
+

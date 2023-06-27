@@ -24,6 +24,7 @@ urlpatterns = [
     path('logistics/', views.logistics_list_view, name='logistics'),
     path('logistics/<int:pk>/edit/', views.logistics_update_view, name='logistics_edit'),
     path('logistics/<int:pk>/edit/company_edit', views.logistics_edit_company_view, name='company_edit'),
+    path('logistics/delete/<int:pk>/', views.logistics_delete, name='logistics_delete'),
     path('delete_request/<int:pk>/', views.delete_request, name='delete_request'),
     path('delete_district/<int:pk>/', views.delete_district, name='delete_district'),
 ]
