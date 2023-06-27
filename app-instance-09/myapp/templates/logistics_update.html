@@ -1,0 +1,63 @@
+<!-- logistics_update.html -->
+{% extends 'main.html' %}
+{% block content %}
+    <h2>Update Logistics Company Info</h2>
+    <a href="{% url 'company_edit' pk=logistics.pk %}" class="btn btn-primary">Edit Company Info</a>
+
+    <h3>Operational Districts:</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>District ID</th>
+                <th>District Name</th>
+                <th>Cost of Outsource</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for logistic_district in logistics_districts %}
+                <tr>
+                    <td>{{ logistic_district.District_DistrictID.DistrictID }}</td>
+                    <td>{{ logistic_district.District_DistrictID.DistrictName }}</td>
+                    <td>{{ logistic_district.CostOfOutsource }}</td>
+                    <td>
+                        <form method="POST" action="{% url 'delete_district' pk=logistic_district.pk %}">
+                            {% csrf_token %}
+                            <button class="btn btn-danger" type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+
+    </table>
+    <h3>Add a New District To Company:</h3>
+    <form method="POST">
+        {% csrf_token %}
+        {{ district_form.as_p }}
+        <button type="submit" class="btn btn-primary">Add District</button>
+    </form>
+    <h3>Requests assigned to Company:</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Request ID</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for company_request in company_requests %}
+                <tr>
+                    <td>{{ company_request.Request_RequestID.RequestID }}</td>
+                    <td>
+                        <form method="POST" action="{% url 'delete_request' pk=company_request.pk %}">
+                            {% csrf_token %}
+                            <button class="btn btn-danger" type="submit">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

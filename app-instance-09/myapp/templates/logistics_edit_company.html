@@ -1,0 +1,19 @@
+{% extends 'main.html' %}
+{% block content %}
+    <h2>Edit Company Information</h2>
+    <form method="POST" id="companyForm">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Update</button>
+    </form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('companyForm').addEventListener('submit', function(event) {
+    if (!confirm("Are you sure you want to update?")) {
+        event.preventDefault();
+    }
+});
+</script>
+{% endblock %}
